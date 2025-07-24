@@ -1,0 +1,20 @@
+{
+  "name": "thunkable-clone",
+  "version": "0.1.0",
+  "description": "Open source Thunkable X Clone with Electron, Blockly, native UI designer, and real-time mobile preview.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "author": "Certsoftt",
+  "license": "MIT",
+  "dependencies": {
+    "blockly": "^10.0.0"
+  },
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.0.0",
+    "electron-builder-squirrel-windows": "^24.13.3"
+  }
+}

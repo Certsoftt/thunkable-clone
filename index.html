@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thunkable X Clone</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="node_modules/blockly/blockly.min.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="ui-designer">
+      <h2>UI Designer (Native)</h2>
+      <div id="ui-palette">
+        <strong>Palette:</strong>
+        <div class="palette-item" draggable="true" data-type="button">Button</div>
+        <div class="palette-item" draggable="true" data-type="label">Label</div>
+        <div class="palette-item" draggable="true" data-type="image">Image</div>
+        <div class="palette-item" draggable="true" data-type="input">Input</div>
+      </div>
+      <div id="ui-canvas"></div>
+    </div>
+    <div id="blockly-area">
+      <h2>Logic (Blockly)</h2>
+      <div id="blocklyDiv" style="height: 480px; width: 600px;"></div>
+    </div>
+    <div id="mobile-preview">
+      <h2>Mobile Preview (Live)</h2>
+      <iframe id="preview-frame" width="300" height="600"></iframe>
+    </div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
