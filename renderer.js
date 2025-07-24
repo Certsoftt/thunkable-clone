@@ -1,3 +1,83 @@
+  // Export APK button logic (placeholder)
+  document.getElementById('export-apk').onclick = () => {
+    // Gather project data
+    updateLayoutFromCanvas();
+    const project = {
+      layout,
+      blockly: Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace)),
+      eventBlocklies: Object.fromEntries(Object.entries(eventBlocklies).map(([k, ws]) => [k, Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(ws))]))
+    };
+    // TODO: Integrate Cordova/Capacitor or similar to build APK
+    alert('APK export is not yet implemented. Project data exported to console.');
+    console.log('Exported project:', project);
+  };
+  // Store per-event Blockly workspaces
+  const eventBlocklies = {};
+  // Blockly event mapping UI
+  function updateEventMappingUI() {
+    const form = document.getElementById('event-mapping-form');
+    if (!form) return;
+    form.innerHTML = '';
+    // List all components with events
+    layout.forEach(item => {
+      let events = [];
+      if (['button', 'input', 'switch', 'slider', 'dropdown', 'checkbox', 'datepicker'].includes(item.type)) {
+        if (item.type === 'button') events.push('onClick');
+        else events.push('onChange');
+      }
+      if (events.length === 0) return;
+      const compLabel = document.createElement('div');
+      compLabel.innerHTML = `<strong>${item.type} (${item.id})</strong>`;
+      form.appendChild(compLabel);
+      events.forEach(ev => {
+        const label = document.createElement('label');
+        label.innerText = `Event: ${ev}`;
+        const editBtn = document.createElement('button');
+        editBtn.innerText = 'Edit Logic';
+        editBtn.style.marginLeft = '8px';
+        editBtn.type = 'button';
+        editBtn.onclick = () => openMiniBlockly(item.id, ev);
+        form.appendChild(label);
+        form.appendChild(editBtn);
+      });
+      form.appendChild(document.createElement('br'));
+    });
+  }
+  // Mini Blockly editor modal logic
+  let miniBlockly = null;
+  function openMiniBlockly(compId, eventName) {
+    const modal = document.getElementById('mini-blockly-modal');
+    const area = document.getElementById('mini-blockly-area');
+    const title = document.getElementById('mini-blockly-title');
+    if (!modal || !area || !title) return;
+    modal.style.display = 'block';
+    title.innerText = `Edit Logic for ${compId} (${eventName})`;
+    area.innerHTML = '';
+    // Create Blockly workspace for this event/component if not exists
+    const key = compId + '_' + eventName;
+    if (!eventBlocklies[key]) {
+      eventBlocklies[key] = Blockly.inject(area, {
+        toolbox: workspace.options.toolbox,
+      });
+    } else {
+      // Move existing workspace DOM node
+      area.appendChild(eventBlocklies[key].svgBlockCanvas_.parentNode.parentNode);
+    }
+    miniBlockly = eventBlocklies[key];
+  }
+  document.getElementById('close-mini-blockly').onclick = () => {
+    document.getElementById('mini-blockly-modal').style.display = 'none';
+    miniBlockly = null;
+  };
+
+  // Call updateEventMappingUI whenever layout changes
+  const origUpdateLayoutFromCanvas = updateLayoutFromCanvas;
+  updateLayoutFromCanvas = function() {
+    origUpdateLayoutFromCanvas.apply(this, arguments);
+    updateEventMappingUI();
+  };
+  // Initial call
+  updateEventMappingUI();
 // Renderer process for Electron (UI logic)
 window.addEventListener('DOMContentLoaded', () => {
   // Initialize Blockly
@@ -48,6 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // Add a UI component to the canvas
+  let nextComponentId = 1;
   function addUIComponent(type, x, y, props = {}) {
     const el = document.createElement('div');
     el.className = 'ui-component';
@@ -56,6 +137,9 @@ window.addEventListener('DOMContentLoaded', () => {
     el.setAttribute('data-type', type);
     el.setAttribute('draggable', 'true');
     el.tabIndex = 0;
+    // Assign unique ID
+    const compId = 'comp_' + nextComponentId++;
+    el.setAttribute('data-id', compId);
     // Set default properties
     let defaultProps = { text: type.charAt(0).toUpperCase() + type.slice(1), width: 100, height: 32 };
     if (type === 'image') defaultProps.src = '';
@@ -115,7 +199,7 @@ window.addEventListener('DOMContentLoaded', () => {
     el._props = props;
     canvas.appendChild(el);
     // Add to layout
-    layout.push({ type, x, y, props });
+    layout.push({ id: compId, type, x, y, props });
     updatePreview();
   }
 
@@ -238,32 +322,61 @@ window.addEventListener('DOMContentLoaded', () => {
     let html = '<html><body style="margin:0;padding:0;font-family:sans-serif;background:#fafafa;">';
     layout.forEach(item => {
       const style = `position:absolute;left:${item.x}px;top:${item.y}px;width:${item.props.width||100}px;height:${item.props.height||32}px;`;
+      const idAttr = `id='${item.id}'`;
       if (item.type === 'button') {
-        html += `<button style="${style}">${item.props.text||'Button'}</button>`;
+        html += `<button ${idAttr} style="${style}" onclick="window.parent.postMessage({event:'onClick',id:'${item.id}'},'*')">${item.props.text||'Button'}</button>`;
       } else if (item.type === 'label') {
-        html += `<div style="${style};display:flex;align-items:center;justify-content:center;">${item.props.text||'Label'}</div>`;
+        html += `<div ${idAttr} style="${style};display:flex;align-items:center;justify-content:center;">${item.props.text||'Label'}</div>`;
       } else if (item.type === 'image') {
-        html += `<img src="${item.props.src||''}" style="${style}" alt="Image"/>`;
+        html += `<img ${idAttr} src="${item.props.src||''}" style="${style}" alt="Image"/>`;
       } else if (item.type === 'input') {
-        html += `<input type="text" placeholder="${item.props.placeholder||''}" style="${style}"/>`;
+        html += `<input ${idAttr} type="text" placeholder="${item.props.placeholder||''}" style="${style}" onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')"/>`;
       } else if (item.type === 'switch') {
-        html += `<label style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''}/> Switch</label>`;
+        html += `<label ${idAttr} style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''} onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')"/> Switch</label>`;
       } else if (item.type === 'slider') {
-        html += `<input type="range" min="${item.props.min||0}" max="${item.props.max||100}" value="${item.props.value||50}" style="${style}"/>`;
+        html += `<input ${idAttr} type="range" min="${item.props.min||0}" max="${item.props.max||100}" value="${item.props.value||50}" style="${style}" onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')"/>`;
       } else if (item.type === 'dropdown') {
         const opts = (item.props.options||'').split(',').map(o=>`<option>${o.trim()}</option>`).join('');
-        html += `<select style="${style}">${opts}</select>`;
+        html += `<select ${idAttr} style="${style}" onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')">${opts}</select>`;
       } else if (item.type === 'checkbox') {
-        html += `<label style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''}/> Checkbox</label>`;
+        html += `<label ${idAttr} style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''} onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')"/> Checkbox</label>`;
       } else if (item.type === 'progressbar') {
-        html += `<progress style="${style}" value="${item.props.value||0}" max="${item.props.max||100}"></progress>`;
+        html += `<progress ${idAttr} style="${style}" value="${item.props.value||0}" max="${item.props.max||100}"></progress>`;
       } else if (item.type === 'datepicker') {
-        html += `<input type="date" value="${item.props.value||''}" style="${style}"/>`;
+        html += `<input ${idAttr} type="date" value="${item.props.value||''}" style="${style}" onchange="window.parent.postMessage({event:'onChange',id:'${item.id}'},'*')"/>`;
       }
     });
+    html += `<script>window.addEventListener('message',()=>{});</script>`;
     html += '</body></html>';
     previewFrame.srcdoc = html;
   }
+  // Listen for events from preview
+  window.addEventListener('message', (e) => {
+    if (!e.data || !e.data.event || !e.data.id) return;
+    // Find mapping
+    const comp = layout.find(c => c.id === e.data.id);
+    if (!comp) return;
+    // Run per-event Blockly code if exists
+    const key = comp.id + '_' + e.data.event;
+    if (eventBlocklies[key]) {
+      try {
+        const code = Blockly.JavaScript.workspaceToCode(eventBlocklies[key]);
+        // eslint-disable-next-line no-eval
+        eval(code);
+      } catch (err) {
+        alert('Error running event logic: ' + err);
+      }
+      return;
+    }
+    // Fallback: run all workspace code
+    try {
+      const code = Blockly.JavaScript.workspaceToCode(workspace);
+      // eslint-disable-next-line no-eval
+      eval(code);
+    } catch (err) {
+      alert('Error running Blockly code: ' + err);
+    }
+  });
 
   // Real-time mobile preview logic (placeholder)
   const previewFrame = document.getElementById('preview-frame');
