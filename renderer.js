@@ -19,6 +19,77 @@
       eventBlocklies: {
         'comp_4_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Submitted!</field></shadow></value></block></xml>'
       }
+    },
+    counter: {
+      layout: [
+        {id:'comp_5', type:'label', x:60, y:60, props:{text:'0',width:60,height:32}},
+        {id:'comp_6', type:'button', x:60, y:110, props:{text:'Increment',width:100,height:40}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {
+        'comp_6_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="variables_set" x="10" y="10"><field name="VAR">count</field><value name="VALUE"><block type="math_arithmetic"><field name="OP">ADD</field><value name="A"><block type="variables_get"><field name="VAR">count</field></block></value><value name="B"><block type="math_number"><field name="NUM">1</field></block></value></block></value></block><block type="text_print" x="10" y="80"><value name="TEXT"><block type="variables_get"><field name="VAR">count</field></block></value></block></xml>'
+      }
+    },
+    survey: {
+      layout: [
+        {id:'comp_7', type:'label', x:40, y:40, props:{text:'Survey:',width:80,height:32}},
+        {id:'comp_8', type:'dropdown', x:130, y:40, props:{options:'Yes,No,Maybe',width:100,height:32}},
+        {id:'comp_9', type:'button', x:40, y:90, props:{text:'Submit',width:100,height:40}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {
+        'comp_9_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Survey submitted!</field></shadow></value></block></xml>'
+      }
+    },
+    imageview: {
+      layout: [
+        {id:'comp_10', type:'image', x:60, y:60, props:{src:'https://placekitten.com/200/200',width:120,height:120}},
+        {id:'comp_11', type:'label', x:60, y:200, props:{text:'Cute Kitten',width:120,height:32}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {}
+    },
+    login: {
+      layout: [
+        {id:'comp_12', type:'label', x:60, y:60, props:{text:'Login',width:120,height:32}},
+        {id:'comp_13', type:'input', x:60, y:110, props:{placeholder:'Username',width:140,height:32}},
+        {id:'comp_14', type:'input', x:60, y:150, props:{placeholder:'Password',width:140,height:32}},
+        {id:'comp_15', type:'button', x:60, y:200, props:{text:'Sign In',width:100,height:40}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {
+        'comp_15_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Login pressed!</field></shadow></value></block></xml>'
+      }
+    },
+    todo: {
+      layout: [
+        {id:'comp_16', type:'label', x:40, y:40, props:{text:'To-Do List',width:120,height:32}},
+        {id:'comp_17', type:'input', x:40, y:90, props:{placeholder:'Add new task',width:140,height:32}},
+        {id:'comp_18', type:'button', x:190, y:90, props:{text:'Add',width:60,height:32}},
+        {id:'comp_19', type:'label', x:40, y:140, props:{text:'• Sample Task',width:180,height:32}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {
+        'comp_18_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Add button pressed!</field></shadow></value></block></xml>'
+      }
+    },
+    weather: {
+      layout: [
+        {id:'comp_20', type:'label', x:60, y:60, props:{text:'Weather',width:120,height:32}},
+        {id:'comp_21', type:'label', x:60, y:100, props:{text:'🌤️ 25°C',width:120,height:32}},
+        {id:'comp_22', type:'label', x:60, y:140, props:{text:'Sunny',width:120,height:32}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {}
+    },
+    profile: {
+      layout: [
+        {id:'comp_23', type:'label', x:60, y:60, props:{text:'👤 John Doe',width:140,height:32}},
+        {id:'comp_24', type:'label', x:60, y:100, props:{text:'Email: john@example.com',width:180,height:32}},
+        {id:'comp_25', type:'label', x:60, y:140, props:{text:'Location: Earth',width:180,height:32}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"></xml>',
+      eventBlocklies: {}
     }
   };
 
