@@ -1,3 +1,54 @@
+  // Pre-built templates
+  const templates = {
+    hello: {
+      layout: [
+        {id:'comp_1', type:'button', x:60, y:100, props:{text:'Say Hello',width:120,height:40}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"><block type="controls_if" x="10" y="10"></block></xml>',
+      eventBlocklies: {
+        'comp_1_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Hello, World!</field></shadow></value></block></xml>'
+      }
+    },
+    form: {
+      layout: [
+        {id:'comp_2', type:'label', x:40, y:60, props:{text:'Name:',width:60,height:32}},
+        {id:'comp_3', type:'input', x:110, y:60, props:{placeholder:'Enter name',width:120,height:32}},
+        {id:'comp_4', type:'button', x:40, y:110, props:{text:'Submit',width:100,height:40}}
+      ],
+      blockly: '<xml xmlns="https://developers.google.com/blockly/xml"><block type="controls_if" x="10" y="10"></block></xml>',
+      eventBlocklies: {
+        'comp_4_onClick': '<xml xmlns="https://developers.google.com/blockly/xml"><block type="text_print" x="10" y="10"><value name="TEXT"><shadow type="text"><field name="TEXT">Submitted!</field></shadow></value></block></xml>'
+      }
+    }
+  };
+
+  document.getElementById('template-select').onchange = function() {
+    const val = this.value;
+    if (!val || !templates[val]) return;
+    // Load template layout
+    layout = templates[val].layout.map(obj => ({...obj}));
+    // Load UI
+    canvas.innerHTML = '';
+    layout.forEach(item => {
+      addUIComponent(item.type, item.x, item.y, item.props);
+    });
+    // Load main Blockly workspace
+    Blockly.Xml.clearWorkspaceAndLoadFromXml(Blockly.Xml.textToDom(templates[val].blockly), workspace);
+    // Load event blocklies
+    Object.entries(templates[val].eventBlocklies).forEach(([k, xml]) => {
+      if (!eventBlocklies[k]) {
+        // Create a hidden div for the mini workspace
+        const tempDiv = document.createElement('div');
+        tempDiv.style.display = 'none';
+        document.body.appendChild(tempDiv);
+        eventBlocklies[k] = Blockly.inject(tempDiv, {toolbox: workspace.options.toolbox});
+      }
+      Blockly.Xml.clearWorkspaceAndLoadFromXml(Blockly.Xml.textToDom(xml), eventBlocklies[k]);
+    });
+    updatePreview();
+    updateEventMappingUI();
+    this.value = '';
+  };
   // Export APK button logic (placeholder)
   const fs = require('fs');
   const path = require('path');
