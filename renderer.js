@@ -35,8 +35,16 @@
     html += '</body></html>';
     // Write to cordovaApp/www/index.html
     const wwwPath = path.join(__dirname, 'cordovaApp', 'www');
-    fs.writeFileSync(path.join(wwwPath, 'index.html'), html, 'utf8');
-    // TODO: Add logic.js for Blockly code if needed
+    // Export Blockly logic as logic.js
+    let logicCode = Blockly.JavaScript.workspaceToCode(workspace);
+    // Add per-event logic if any
+    Object.entries(eventBlocklies).forEach(([k, ws]) => {
+      logicCode += '\n// Event: ' + k + '\n' + Blockly.JavaScript.workspaceToCode(ws);
+    });
+    fs.writeFileSync(path.join(wwwPath, 'logic.js'), logicCode, 'utf8');
+    // Inject logic.js into index.html
+    let htmlWithLogic = html.replace('</body>', '<script src="logic.js"></script></body>');
+    fs.writeFileSync(path.join(wwwPath, 'index.html'), htmlWithLogic, 'utf8');
     // Trigger Cordova build
     exec('cd cordovaApp && cordova build android', (err, stdout, stderr) => {
       if (err) {
