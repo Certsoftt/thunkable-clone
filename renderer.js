@@ -1,15 +1,50 @@
   // Export APK button logic (placeholder)
+  const fs = require('fs');
+  const path = require('path');
+  const { exec } = require('child_process');
   document.getElementById('export-apk').onclick = () => {
-    // Gather project data
     updateLayoutFromCanvas();
-    const project = {
-      layout,
-      blockly: Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(workspace)),
-      eventBlocklies: Object.fromEntries(Object.entries(eventBlocklies).map(([k, ws]) => [k, Blockly.Xml.domToText(Blockly.Xml.workspaceToDom(ws))]))
-    };
-    // TODO: Integrate Cordova/Capacitor or similar to build APK
-    alert('APK export is not yet implemented. Project data exported to console.');
-    console.log('Exported project:', project);
+    // Generate Cordova-compatible index.html
+    let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>App</title></head><body style="margin:0;padding:0;font-family:sans-serif;background:#fafafa;">';
+    layout.forEach(item => {
+      const style = `position:absolute;left:${item.x}px;top:${item.y}px;width:${item.props.width||100}px;height:${item.props.height||32}px;`;
+      const idAttr = `id='${item.id}'`;
+      if (item.type === 'button') {
+        html += `<button ${idAttr} style="${style}">${item.props.text||'Button'}</button>`;
+      } else if (item.type === 'label') {
+        html += `<div ${idAttr} style="${style};display:flex;align-items:center;justify-content:center;">${item.props.text||'Label'}</div>`;
+      } else if (item.type === 'image') {
+        html += `<img ${idAttr} src="${item.props.src||''}" style="${style}" alt="Image"/>`;
+      } else if (item.type === 'input') {
+        html += `<input ${idAttr} type="text" placeholder="${item.props.placeholder||''}" style="${style}"/>`;
+      } else if (item.type === 'switch') {
+        html += `<label ${idAttr} style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''}/> Switch</label>`;
+      } else if (item.type === 'slider') {
+        html += `<input ${idAttr} type="range" min="${item.props.min||0}" max="${item.props.max||100}" value="${item.props.value||50}" style="${style}"/>`;
+      } else if (item.type === 'dropdown') {
+        const opts = (item.props.options||'').split(',').map(o=>`<option>${o.trim()}</option>`).join('');
+        html += `<select ${idAttr} style="${style}">${opts}</select>`;
+      } else if (item.type === 'checkbox') {
+        html += `<label ${idAttr} style="${style};display:flex;align-items:center;"><input type="checkbox" ${item.props.checked?'checked':''}/> Checkbox</label>`;
+      } else if (item.type === 'progressbar') {
+        html += `<progress ${idAttr} style="${style}" value="${item.props.value||0}" max="${item.props.max||100}"></progress>`;
+      } else if (item.type === 'datepicker') {
+        html += `<input ${idAttr} type="date" value="${item.props.value||''}" style="${style}"/>`;
+      }
+    });
+    html += '</body></html>';
+    // Write to cordovaApp/www/index.html
+    const wwwPath = path.join(__dirname, 'cordovaApp', 'www');
+    fs.writeFileSync(path.join(wwwPath, 'index.html'), html, 'utf8');
+    // TODO: Add logic.js for Blockly code if needed
+    // Trigger Cordova build
+    exec('cd cordovaApp && cordova build android', (err, stdout, stderr) => {
+      if (err) {
+        alert('Cordova build failed: ' + stderr);
+      } else {
+        alert('APK build complete! Find your APK in cordovaApp/platforms/android/app/build/outputs/apk/');
+      }
+    });
   };
   // Store per-event Blockly workspaces
   const eventBlocklies = {};
