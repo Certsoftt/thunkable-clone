@@ -10,6 +10,34 @@
 </head>
 <body>
   <div id="app">
+    <button id="help-btn" style="position:fixed;top:18px;right:24px;background:#fff;color:#1976d2;border:2px solid #1976d2;padding:6px 14px;border-radius:6px;cursor:pointer;font-weight:bold;z-index:2100;">Help</button>
+    <div id="help-modal" style="display:none;position:fixed;top:10%;left:10%;width:80vw;height:70vh;background:#fff;z-index:2000;border:2px solid #1976d2;border-radius:10px;box-shadow:0 4px 24px rgba(25,118,210,0.15);">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:#1976d2;color:#fff;border-radius:10px 10px 0 0;">
+        <span style="font-size:20px;font-weight:bold;">Help & Getting Started</span>
+        <button id="close-help-modal" style="background:#fff;color:#1976d2;border:none;padding:4px 12px;border-radius:4px;cursor:pointer;">Close</button>
+      </div>
+      <div style="padding:18px 24px;overflow-y:auto;height:calc(100% - 50px);font-size:16px;line-height:1.7;">
+        <h3>Welcome to Thunkable X Clone!</h3>
+        <ul>
+          <li><b>Drag & Drop UI:</b> Use the palette to drag components onto the canvas. Click a component to edit its properties.</li>
+          <li><b>Logic:</b> Use Blockly to visually program your app's logic. Assign logic to UI events using the Event Logic Mapping section.</li>
+          <li><b>Preview:</b> See your app update live in the Mobile Preview panel.</li>
+          <li><b>Templates:</b> Use the template menu to load starter projects instantly.</li>
+          <li><b>Save/Load:</b> Save your project as a JSON file and load it back anytime.</li>
+          <li><b>Export APK:</b> Click Export APK to build an Android APK (requires Cordova & Android SDK).</li>
+        </ul>
+        <h4>Troubleshooting</h4>
+        <ul>
+          <li>For APK export, ensure Java JDK and Android SDK are installed and configured.</li>
+          <li>If you encounter issues, check the README or open an issue on GitHub.</li>
+        </ul>
+        <h4>More Resources</h4>
+        <ul>
+          <li><a href="https://developers.google.com/blockly" target="_blank">Blockly Documentation</a></li>
+          <li><a href="https://cordova.apache.org/docs/en/latest/guide/cli/" target="_blank">Cordova CLI Guide</a></li>
+        </ul>
+      </div>
+    </div>
     <div id="ui-designer">
       <h2>UI Designer (Native)</h2>
       <div id="ui-palette">

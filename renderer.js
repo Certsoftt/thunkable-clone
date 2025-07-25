@@ -1,3 +1,10 @@
+  // In-app help modal logic
+  document.getElementById('help-btn').onclick = () => {
+    document.getElementById('help-modal').style.display = 'block';
+  };
+  document.getElementById('close-help-modal').onclick = () => {
+    document.getElementById('help-modal').style.display = 'none';
+  };
   // Pre-built templates
   const templates = {
     hello: {
