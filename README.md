@@ -24,7 +24,7 @@ A cross-platform, offline, open-source visual programming desktop app for buildi
 1. Clone this repository.
 2. Install dependencies:
    ```
-   npm install
+   yarn install
    ```
 3. Install Cordova globally (if not already):
    ```
@@ -40,7 +40,7 @@ A cross-platform, offline, open-source visual programming desktop app for buildi
 
 ### Running the App
 ```
-npm start
+yarn start
 ```
 
 ### Exporting APK
